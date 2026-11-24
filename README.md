@@ -12,7 +12,7 @@ Projeto de portfólio desenvolvido em HTML, CSS e JavaScript, com foco em acolhi
     <th>Mobile</th>
   </tr>
   <tr>
-    <td valign="top"><img src="assets/desktop.jpg" alt="Mock da versão desktop do site" /></td>
+    <td valign="top"><img src="assets/desktop-2.jpg" alt="Mock da versão desktop do site" /></td>
     <td valign="top"><img src="assets/mobile.jpg" alt="Mock da versão mobile do site" width="280" /></td>
   </tr>
 </table>
