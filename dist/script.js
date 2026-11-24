@@ -1,170 +1,84 @@
 "use strict";
 
-const TIME_ZONE = "America/Sao_Paulo";
-// Horários ilustrativos, sem vínculo com uma agenda real.
-const DEMO_TIMES = ["09:00", "11:00", "14:00", "16:00"];
 const form = document.querySelector("#booking-form");
-const dateInput = document.querySelector("#appointment-date");
+const dateInput = form.elements.date;
 const dateError = document.querySelector("#date-error");
-const timeFieldset = document.querySelector("#time-fieldset");
-const timeOptions = document.querySelector("#time-options");
-const selectionSummary = document.querySelector("#selection-summary");
+const summary = document.querySelector("#selection-summary");
 const dialog = document.querySelector("#booking-dialog");
 const dialogTitle = document.querySelector("#dialog-title");
-const dialogDescription = document.querySelector("#dialog-description");
-const dialogEyebrow = document.querySelector("#dialog-eyebrow");
-const appointmentSummary = document.querySelector("#appointment-summary");
 const confirmButton = document.querySelector("#confirm-demo");
-const editButton = document.querySelector("#edit-choice");
+const confirmation = document.querySelector("#confirmation-message");
 
-// Datas de calendário são tratadas em UTC; o dia atual vem de Brasília.
-// Isso evita que o navegador altere o dia ao converter fusos horários.
-function todayInBrasilia() {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: TIME_ZONE, year: "numeric", month: "2-digit", day: "2-digit"
+// O calendário usa o dia de Brasília, mesmo quando o visitante está em outro fuso.
+function dateAfter(days) {
+  const parts = new Intl.DateTimeFormat("en", {
+    timeZone: "America/Sao_Paulo", year: "numeric", month: "numeric", day: "numeric"
   }).formatToParts(new Date());
-  const part = (type) => parts.find((item) => item.type === type).value;
-  return `${part("year")}-${part("month")}-${part("day")}`;
-}
-
-function calendarDate(value) {
-  return new Date(`${value}T12:00:00Z`);
-}
-
-function addDays(value, amount) {
-  const date = calendarDate(value);
-  date.setUTCDate(date.getUTCDate() + amount);
+  const part = (name) => Number(parts.find((item) => item.type === name).value);
+  const date = new Date(Date.UTC(part("year"), part("month") - 1, part("day") + days));
   return date.toISOString().slice(0, 10);
 }
 
-function isWeekday(value) {
-  const day = calendarDate(value).getUTCDay();
-  return day > 0 && day < 6;
+function formatDate(value) {
+  return new Date(`${value}T12:00:00Z`).toLocaleDateString("pt-BR", {
+    timeZone: "UTC", dateStyle: "long"
+  });
 }
 
-function formatDate(value, options) {
-  return new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC", ...options }).format(calendarDate(value));
-}
-
-function updateDateBounds() {
-  const today = todayInBrasilia();
-  dateInput.min = addDays(today, 1);
-  dateInput.max = addDays(today, 90);
-}
-
-function validateDate() {
-  updateDateBounds();
-  const value = dateInput.value;
+function updateForm() {
+  dateInput.min = dateAfter(1);
+  dateInput.max = dateAfter(90);
+  const date = dateInput.value;
+  const day = new Date(`${date}T12:00:00Z`).getUTCDay();
   let error = "";
-  if (!value) error = "Escolha uma data para ver os horários.";
-  else if (value < dateInput.min || value > dateInput.max) error = "Escolha uma data a partir de amanhã, dentro dos próximos 90 dias.";
-  else if (!isWeekday(value)) error = "O atendimento acontece de segunda a sexta. Escolha um dia útil.";
+
+  if (!date) error = "Escolha uma data para ver os horários.";
+  else if (date < dateInput.min || date > dateInput.max) error = "Escolha uma data entre amanhã e os próximos 90 dias.";
+  else if (day === 0 || day === 6) error = "Escolha um dia de segunda a sexta.";
+
   dateInput.setCustomValidity(error);
   dateInput.setAttribute("aria-invalid", String(Boolean(error)));
   dateError.textContent = error;
-  timeFieldset.disabled = Boolean(error);
+  document.querySelector("#time-fieldset").disabled = Boolean(error);
+  const time = form.elements.time.value;
+  const modality = form.elements.modality.value === "online" ? "Online" : "Presencial";
+  summary.textContent = error || (time
+    ? `${modality} · ${formatDate(date)}, às ${time} · Brasília`
+    : "Selecione um horário para continuar.");
   return !error;
 }
 
-function renderTimes() {
-  timeOptions.replaceChildren();
-  for (const time of DEMO_TIMES) {
-    const label = document.createElement("label");
-    label.className = "choice time-choice";
-    const input = document.createElement("input");
-    input.type = "radio";
-    input.name = "time";
-    input.value = time;
-    input.required = true;
-    const text = document.createElement("span");
-    text.textContent = time;
-    label.append(input, text);
-    timeOptions.append(label);
-  }
-}
-
-function updateSummary() {
-  const data = new FormData(form);
-  if (!dateInput.value || !dateInput.validity.valid) {
-    selectionSummary.textContent = "Escolha uma data válida para continuar.";
-    return;
-  }
-  if (!data.get("time")) {
-    selectionSummary.textContent = "Selecione um horário para continuar.";
-    return;
-  }
-  const modality = data.get("modality") === "online" ? "Online" : "Presencial";
-  const day = formatDate(dateInput.value, { day: "numeric", month: "long" });
-  selectionSummary.textContent = `${modality} · ${day}, às ${data.get("time")} · Brasília`;
-}
-
-function addSummaryRow(label, value) {
-  const row = document.createElement("div");
-  row.className = "summary-row";
-  const term = document.createElement("dt");
-  const description = document.createElement("dd");
-  term.textContent = label;
-  description.textContent = value;
-  row.append(term, description);
-  appointmentSummary.append(row);
-}
-
-function openReview() {
-  const data = new FormData(form);
-  dialogEyebrow.textContent = "Sua escolha";
-  dialogTitle.textContent = "Vamos conferir?";
-  dialogDescription.textContent = "Revise os detalhes da sua sessão demonstrativa.";
-  appointmentSummary.replaceChildren();
-  addSummaryRow("Profissional", "Helena Costa · Perfil fictício");
-  addSummaryRow("Modalidade", data.get("modality") === "online" ? "Online, por videochamada" : "Presencial, em consultório");
-  addSummaryRow("Data", formatDate(dateInput.value, { weekday: "long", day: "numeric", month: "long", year: "numeric" }));
-  addSummaryRow("Horário", `${data.get("time")} · Brasília · 50 minutos`);
-  confirmButton.hidden = false;
-  editButton.textContent = "Alterar minha escolha";
-  document.body.classList.add("dialog-open");
-  dialog.showModal();
-  dialogTitle.focus();
-}
-
 dateInput.addEventListener("change", () => {
-  renderTimes();
-  validateDate();
-  updateSummary();
+  form.querySelectorAll("[name='time']").forEach((input) => { input.checked = false; });
 });
+form.addEventListener("change", updateForm);
 
-form.addEventListener("change", updateSummary);
 form.addEventListener("submit", (event) => {
   event.preventDefault();
-  if (validateDate() && form.reportValidity()) openReview();
-});
+  if (!updateForm() || !form.reportValidity()) return;
 
-// O modal nativo mantém o foco dentro da revisão e oferece fechamento por Escape.
-document.querySelector("#close-dialog").addEventListener("click", () => dialog.close());
-editButton.addEventListener("click", () => dialog.close());
-dialog.addEventListener("close", () => {
-  document.body.classList.remove("dialog-open");
-  form.querySelector("[type='submit']").focus({ preventScroll: true });
+  document.querySelector("#summary-modality").textContent = form.elements.modality.value === "online"
+    ? "Online, por videochamada" : "Presencial, em consultório";
+  document.querySelector("#summary-date").textContent = formatDate(dateInput.value);
+  document.querySelector("#summary-time").textContent = `${form.elements.time.value} · Brasília · 50 minutos`;
+  dialogTitle.textContent = "Vamos conferir?";
+  confirmation.hidden = true;
+  confirmButton.hidden = false;
+  dialog.showModal();
+  dialogTitle.focus();
 });
 
 confirmButton.addEventListener("click", () => {
-  dialogEyebrow.textContent = "Demonstração concluída";
-  dialogTitle.textContent = "Seu primeiro passo.";
-  dialogDescription.textContent = "Você chegou ao fim do fluxo demonstrativo. Nenhuma consulta foi marcada e nenhum dado foi enviado.";
+  dialogTitle.textContent = "Simulação concluída.";
+  confirmation.hidden = false;
   confirmButton.hidden = true;
-  editButton.textContent = "Voltar à agenda";
   dialogTitle.focus();
 });
 
-// Se a página ficar aberta até o dia seguinte, os limites precisam acompanhar a data.
-window.addEventListener("focus", () => {
-  validateDate();
-  updateSummary();
-});
-
-updateDateBounds();
-let initialDate = dateInput.min;
-while (!isWeekday(initialDate)) initialDate = addDays(initialDate, 1);
-dateInput.value = initialDate;
-renderTimes();
-validateDate();
-updateSummary();
+dateInput.value = dateAfter(1);
+while ([0, 6].includes(new Date(`${dateInput.value}T12:00:00Z`).getUTCDay())) {
+  const nextDay = new Date(`${dateInput.value}T12:00:00Z`);
+  nextDay.setUTCDate(nextDay.getUTCDate() + 1);
+  dateInput.value = nextDay.toISOString().slice(0, 10);
+}
+updateForm();

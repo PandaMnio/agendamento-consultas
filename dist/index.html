@@ -103,7 +103,12 @@
           </div>
           <fieldset id="time-fieldset">
             <legend>Horários disponíveis <span class="legend-detail">· Brasília</span></legend>
-            <div class="time-options" id="time-options"></div>
+            <div class="time-options">
+              <label class="choice time-choice"><input type="radio" name="time" value="09:00" required><span>09:00</span></label>
+              <label class="choice time-choice"><input type="radio" name="time" value="11:00" required><span>11:00</span></label>
+              <label class="choice time-choice"><input type="radio" name="time" value="14:00" required><span>14:00</span></label>
+              <label class="choice time-choice"><input type="radio" name="time" value="16:00" required><span>16:00</span></label>
+            </div>
           </fieldset>
           <p class="selection-summary" id="selection-summary" aria-live="polite">Selecione um horário para continuar.</p>
           <button class="button button-primary review-button" type="submit">Revisar escolha</button>
@@ -119,15 +124,22 @@
       <a class="photo-credit" href="https://unsplash.com/photos/a-modern-hallway-with-a-chair-by-the-window-qraqqY9i860" target="_blank" rel="noopener noreferrer">Imagem ilustrativa: Zara Johnson / Unsplash</a>
     </footer>
 
-    <dialog class="booking-dialog" id="booking-dialog" aria-labelledby="dialog-title" aria-describedby="dialog-description">
-      <button class="dialog-close" type="button" id="close-dialog" aria-label="Fechar revisão">×</button>
-      <p class="eyebrow" id="dialog-eyebrow">Sua escolha</p>
-      <h2 id="dialog-title" tabindex="-1">Vamos conferir?</h2>
-      <p id="dialog-description">Revise os detalhes da sua sessão demonstrativa.</p>
-      <dl class="appointment-summary" id="appointment-summary"></dl>
-      <p class="dialog-notice">Esta é uma simulação. Não há reserva de horário nem envio de informações.</p>
-      <button class="button button-primary" id="confirm-demo" type="button">Concluir simulação</button>
-      <button class="text-button" id="edit-choice" type="button">Alterar minha escolha</button>
+    <dialog class="booking-dialog" id="booking-dialog" aria-labelledby="dialog-title" aria-describedby="dialog-notice">
+      <form method="dialog">
+        <button class="dialog-close" type="submit" aria-label="Fechar revisão">×</button>
+        <p class="eyebrow">Agenda demonstrativa</p>
+        <h2 id="dialog-title" tabindex="-1">Vamos conferir?</h2>
+        <dl class="appointment-summary">
+          <div class="summary-row"><dt>Profissional</dt><dd>Helena Costa · Perfil fictício</dd></div>
+          <div class="summary-row"><dt>Modalidade</dt><dd id="summary-modality"></dd></div>
+          <div class="summary-row"><dt>Data</dt><dd id="summary-date"></dd></div>
+          <div class="summary-row"><dt>Horário</dt><dd id="summary-time"></dd></div>
+        </dl>
+        <p class="dialog-notice" id="dialog-notice">Esta é uma simulação. Não há reserva de horário nem envio de informações.</p>
+        <p id="confirmation-message" role="status" hidden>Você chegou ao fim do fluxo demonstrativo. Nenhuma consulta foi marcada e nenhum dado foi enviado.</p>
+        <button class="button button-primary" id="confirm-demo" type="button">Concluir simulação</button>
+        <button class="text-button" type="submit">Voltar à agenda</button>
+      </form>
     </dialog>
   </body>
 </html>
