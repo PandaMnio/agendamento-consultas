@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#233b49">
+    <meta name="description" content="Conheça o atendimento e explore o agendamento de Helena Costa, uma psicóloga fictícia neste projeto de portfólio.">
+    <title>Helena Costa | Psicologia</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="#inicio" aria-label="Helena Costa, início">
+          <span class="brand-name">Helena Costa<span class="brand-dot">.</span></span>
+          <span class="brand-description">Psicologia</span>
+        </a>
+        <nav class="navigation" aria-label="Navegação principal">
+          <a href="#atendimento">O atendimento</a>
+          <a href="#sobre">Sobre mim</a>
+          <a class="button button-outline header-appointment" href="#agendamento">Agendar consulta</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="conteudo">
+      <section class="hero container" id="inicio" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="short-line" aria-hidden="true"></span>Psicoterapia individual</p>
+          <h1 id="hero-title">Um espaço para<br>olhar <em>para si.</em></h1>
+          <p class="hero-description">Entre tudo o que a vida pede, um tempo para você. Um encontro com a sua história, no seu ritmo.</p>
+          <a class="button button-primary" href="#agendamento">Agendar uma consulta</a>
+          <p class="hero-detail">Atendimento a adultos · Online e presencial</p>
+          <div class="hero-footnote">
+            <span class="footnote-mark" aria-hidden="true">HC</span>
+            <p>Escuta com presença.<br>Cuidado com singularidade.</p>
+          </div>
+        </div>
+        <figure class="hero-visual">
+          <img src="assets/consultorio.jpg" alt="Poltrona junto a uma janela com cortinas leves, em um ambiente de linhas retas e luz natural." width="1200" height="1800" fetchpriority="high">
+          <figcaption><span>Um tempo de pausa.</span><span>Um espaço de escuta.</span></figcaption>
+        </figure>
+      </section>
+
+      <section class="care-section" id="atendimento" aria-labelledby="care-title">
+        <div class="container care-layout">
+          <div class="section-intro">
+            <p class="eyebrow">O atendimento</p>
+            <h2 id="care-title">O primeiro passo<br>pode ser uma conversa.</h2>
+          </div>
+          <div class="care-content">
+            <p>A psicoterapia é um espaço para falar sobre o que faz parte da sua vida: sentimentos, relações, mudanças e questões que ainda não encontraram palavras.</p>
+            <div class="care-facts">
+              <div><h3>Individual</h3><p>Um encontro dedicado à sua história.</p></div>
+              <div><h3>50 minutos</h3><p>Um tempo reservado para cada sessão.</p></div>
+              <div><h3>Do seu jeito</h3><p>Escolha entre online e presencial.</p></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="about-section container" id="sobre" aria-labelledby="about-title">
+        <p class="eyebrow">Helena Costa · Psicóloga fictícia</p>
+        <div class="about-layout">
+          <h2 id="about-title">A escuta como<br>ponto de partida.</h2>
+          <div>
+            <p>Acredito no valor de um encontro em que você possa ser ouvido com atenção e respeito. Minha proposta é construir esse espaço com você, acolhendo sua história e o seu tempo.</p>
+            <p class="about-note">Este perfil é fictício e foi criado para um projeto de portfólio. Os serviços e os horários apresentados são ilustrativos.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="booking-section container" id="agendamento" aria-labelledby="booking-title">
+        <div class="booking-intro">
+          <p class="eyebrow">Agendamento</p>
+          <h2 id="booking-title">Reserve um <br>tempo para você.</h2>
+          <p>Escolha como prefere conversar e encontre um horário que se encaixe na sua rotina.</p>
+          <div class="booking-details">
+            <p>Psicoterapia individual</p>
+            <p>Sessão de 50 minutos</p>
+            <p>Horário de Brasília</p>
+          </div>
+          <p class="demo-note">Agenda demonstrativa.<br>Nenhuma consulta real será marcada.</p>
+        </div>
+        <form class="booking-form" id="booking-form" aria-labelledby="form-title">
+          <h3 id="form-title">Escolha seu horário</h3>
+          <fieldset>
+            <legend>Como prefere ser atendido?</legend>
+            <div class="modality-options">
+              <label class="choice modality-choice"><input type="radio" name="modality" value="online" checked><span>Online<small>Por videochamada</small></span></label>
+              <label class="choice modality-choice"><input type="radio" name="modality" value="presencial"><span>Presencial<small>Em consultório</small></span></label>
+            </div>
+          </fieldset>
+          <div class="date-field">
+            <label for="appointment-date">Qual dia fica melhor?</label>
+            <input type="date" id="appointment-date" name="date" required aria-describedby="date-hint date-error">
+            <p class="field-hint" id="date-hint">De segunda a sexta, nos próximos 90 dias.</p>
+            <p class="field-error" id="date-error" aria-live="polite"></p>
+          </div>
+          <fieldset id="time-fieldset">
+            <legend>Horários disponíveis <span class="legend-detail">· Brasília</span></legend>
+            <div class="time-options" id="time-options"></div>
+          </fieldset>
+          <p class="selection-summary" id="selection-summary" aria-live="polite">Selecione um horário para continuar.</p>
+          <button class="button button-primary review-button" type="submit">Revisar escolha</button>
+          <p class="form-note">Você pode revisar sua escolha antes de concluir a simulação.</p>
+          <noscript><p class="field-error">Ative o JavaScript para explorar a agenda demonstrativa.</p></noscript>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-footer container">
+      <a class="brand footer-brand" href="#inicio"><span class="brand-name">Helena Costa<span class="brand-dot">.</span></span><span class="brand-description">Psicologia</span></a>
+      <p>Projeto de portfólio · Profissional fictícia</p>
+      <a class="photo-credit" href="https://unsplash.com/photos/a-modern-hallway-with-a-chair-by-the-window-qraqqY9i860" target="_blank" rel="noopener noreferrer">Imagem ilustrativa: Zara Johnson / Unsplash</a>
+    </footer>
+
+    <dialog class="booking-dialog" id="booking-dialog" aria-labelledby="dialog-title" aria-describedby="dialog-description">
+      <button class="dialog-close" type="button" id="close-dialog" aria-label="Fechar revisão">×</button>
+      <p class="eyebrow" id="dialog-eyebrow">Sua escolha</p>
+      <h2 id="dialog-title" tabindex="-1">Vamos conferir?</h2>
+      <p id="dialog-description">Revise os detalhes da sua sessão demonstrativa.</p>
+      <dl class="appointment-summary" id="appointment-summary"></dl>
+      <p class="dialog-notice">Esta é uma simulação. Não há reserva de horário nem envio de informações.</p>
+      <button class="button button-primary" id="confirm-demo" type="button">Concluir simulação</button>
+      <button class="text-button" id="edit-choice" type="button">Alterar minha escolha</button>
+    </dialog>
+  </body>
+</html>
