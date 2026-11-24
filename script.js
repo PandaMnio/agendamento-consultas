@@ -230,6 +230,42 @@ dateInput.value = quickDates.querySelector("button")?.value || "";
 updateForm();
 form.querySelector("[type='submit']").disabled = false;
 
+// Menu expansível do cabeçalho em telas menores.
+const siteHeader = document.querySelector(".site-header");
+const menuToggle = document.querySelector(".menu-toggle");
+const siteMenu = document.querySelector("#site-menu");
+
+function setMenu(open) {
+  siteHeader.classList.toggle("menu-open", open);
+  menuToggle.setAttribute("aria-expanded", String(open));
+  menuToggle.setAttribute("aria-label", open ? "Fechar menu" : "Abrir menu");
+}
+
+menuToggle.addEventListener("click", () => {
+  setMenu(menuToggle.getAttribute("aria-expanded") !== "true");
+});
+siteMenu.addEventListener("click", (event) => {
+  if (event.target.closest("a")) {
+    setMenu(false);
+  }
+});
+document.addEventListener("click", (event) => {
+  if (siteHeader.classList.contains("menu-open") && !siteHeader.contains(event.target)) {
+    setMenu(false);
+  }
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && siteHeader.classList.contains("menu-open")) {
+    setMenu(false);
+    menuToggle.focus();
+  }
+});
+matchMedia("(min-width: 901px)").addEventListener("change", (event) => {
+  if (event.matches) {
+    setMenu(false);
+  }
+});
+
 // Observa a saída do topo da página, sem executar código a cada evento de rolagem.
 if ("IntersectionObserver" in window) {
   const header = document.querySelector(".site-header");
@@ -251,5 +287,13 @@ if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: re
     },
     { threshold: 0.08 },
   );
-  document.querySelectorAll("[data-reveal]").forEach((element) => observer.observe(element));
+  // O que já está na tela aparece direto; só o restante é escondido e observado.
+  document.querySelectorAll("[data-reveal]").forEach((element) => {
+    if (element.getBoundingClientRect().top < innerHeight) {
+      element.classList.add("is-visible");
+    } else {
+      observer.observe(element);
+    }
+  });
+  document.documentElement.classList.add("reveal-ready");
 }
