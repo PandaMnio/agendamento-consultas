@@ -1,3 +1,4 @@
+/* Base */
 :root {
   --font-sans: Manrope, sans-serif;
   --font-serif: "Cormorant Garamond", Georgia, serif;
@@ -8,13 +9,16 @@
   --navy: #1d3541;
   --paper: #f7f5f0;
   --bronze: #8d6845;
+  --bronze-light: #ccb28e;
+  --bronze-soft: #b89b76;
   --text: #555c5d;
+  --text-on-dark: #dddeda;
   --muted: #6b6b64;
   --line: #ddd8ce;
   --line-warm: #d3cabd;
   --line-on-dark: #ffffff26;
   --surface-muted: #eeeae2;
-  --bronze-light: #ccb28e;
+  --highlight-on-dark: #e3c9a6;
 }
 * {
   box-sizing: border-box;
@@ -58,6 +62,7 @@ summary,
 .choice {
   cursor: pointer;
 }
+/* Fica separado: um pseudo-elemento -webkit- invalidaria a lista inteira em outros navegadores. */
 input[type="date"]:enabled::-webkit-calendar-picker-indicator {
   cursor: pointer;
 }
@@ -99,6 +104,8 @@ h3 {
 em {
   color: var(--bronze);
 }
+
+/* Layout e componentes */
 .list-reset {
   margin: 0;
   padding: 0;
@@ -185,9 +192,8 @@ em {
   transform: translateY(-200%);
 }
 .skip-link:focus {
-  transform: translateY(0);
+  transform: none;
 }
-
 .icon-sprite {
   position: absolute;
   overflow: hidden;
@@ -203,12 +209,14 @@ em {
   stroke-linejoin: round;
   transition: transform 0.25s ease;
 }
+.image-frame {
+  overflow: hidden;
+}
 
-/* Cabeçalho e primeira impressão */
+/* Cabeçalho */
 .scroll-marker {
   position: absolute;
   top: 1.5rem;
-  left: 0;
   width: 1px;
   height: 1px;
   pointer-events: none;
@@ -230,14 +238,10 @@ em {
     box-shadow 0.25s;
 }
 .site-header.is-scrolled {
+  background: rgb(247 245 240 / 0.82);
   box-shadow: 0 4px 24px #1d35410a;
-}
-@supports (backdrop-filter: blur(16px)) or (-webkit-backdrop-filter: blur(16px)) {
-  .site-header.is-scrolled {
-    background: rgb(247 245 240 / 0.82);
-    -webkit-backdrop-filter: blur(16px) saturate(130%);
-    backdrop-filter: blur(16px) saturate(130%);
-  }
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+  backdrop-filter: blur(16px) saturate(130%);
 }
 .header-content,
 .navigation,
@@ -262,12 +266,14 @@ em {
   font-size: 3rem;
   letter-spacing: -0.1em;
 }
-.brand-name {
+.brand-name,
+.brand-label {
   display: block;
+}
+.brand-name {
   font-size: 2rem;
 }
 .brand-label {
-  display: block;
   margin-top: 0.45rem;
   font-size: 0.75rem;
   letter-spacing: 0.2em;
@@ -280,27 +286,34 @@ em {
 .navigation > a:not(.button):hover {
   color: var(--bronze);
 }
+.navigation > a:not(.button):is(:hover, :focus-visible),
+.footer-navigation a:is(:hover, :focus-visible) {
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
 .menu-toggle {
   display: none;
 }
 @media (min-width: 901px) {
-  .site-header .brand-mark,
-  .site-header .brand-name {
+  .brand-mark,
+  .brand-name {
     transition: font-size var(--header-transition);
   }
-  .site-header.is-scrolled .header-content {
+  .is-scrolled .header-content {
     min-height: 4.5rem;
   }
-  .site-header.is-scrolled .brand-mark {
+  .is-scrolled .brand-mark {
     font-size: 2.5rem;
   }
-  .site-header.is-scrolled .brand-name {
+  .is-scrolled .brand-name {
     font-size: 1.75rem;
   }
-  .site-header.is-scrolled .button {
+  .is-scrolled .button {
     padding-block: 0.55rem;
   }
 }
+
+/* Primeira dobra */
 .hero {
   display: grid;
   grid-template-columns: 1.08fr 1fr;
@@ -335,12 +348,6 @@ em {
 }
 .hero-visual {
   position: relative;
-}
-.image-frame {
-  overflow: hidden;
-}
-.image-frame img {
-  transition: transform 0.8s cubic-bezier(0.2, 0.65, 0.3, 1);
 }
 .hero-visual .image-frame {
   position: absolute;
@@ -392,7 +399,10 @@ em {
   color: var(--bronze-light);
 }
 
-/* Conteúdo e apresentação da profissional */
+/* Atendimento */
+#atendimento {
+  padding-bottom: clamp(1.5rem, 4vw, 3rem);
+}
 .intro-copy {
   padding-top: 2rem;
 }
@@ -415,8 +425,7 @@ em {
   padding-block: clamp(1.5rem, 3.6vw, 2.75rem);
   border-bottom: 1px solid var(--line);
 }
-.topics .topic-icon {
-  grid-column: 1;
+.topic-icon {
   grid-row: 1 / span 3;
   width: clamp(1.75rem, 4vw, 3rem);
   height: auto;
@@ -444,12 +453,8 @@ em {
   margin-top: 0.75rem;
   line-height: 1.7;
 }
-.steps h3 {
-  margin-bottom: 1rem;
-}
-#atendimento {
-  padding-bottom: clamp(1.5rem, 4vw, 3rem);
-}
+
+/* Sobre */
 .about {
   background: linear-gradient(var(--paper), var(--surface-muted) clamp(7rem, 16vw, 13rem));
 }
@@ -462,8 +467,7 @@ em {
 }
 .portrait {
   position: relative;
-  padding-right: 1.5rem;
-  padding-bottom: 1.5rem;
+  padding: 0 1.5rem 1.5rem 0;
 }
 .portrait::before {
   content: "";
@@ -522,10 +526,10 @@ em {
   font-style: italic;
 }
 
-/* O percurso até a primeira sessão */
+/* Como funciona */
 .journey {
   background: radial-gradient(ellipse at top right, #45606b66, transparent 65%), var(--navy);
-  color: #dddeda;
+  color: var(--text-on-dark);
 }
 .journey h2,
 .journey h3 {
@@ -538,8 +542,11 @@ em {
 .journey .text-link {
   display: inline-block;
   margin-top: 2rem;
+}
+.journey .text-link,
+.footer-meta .text-link {
   color: var(--paper);
-  border-color: #b89b76;
+  border-color: var(--bronze-soft);
 }
 .steps {
   margin: 0;
@@ -557,9 +564,14 @@ em {
   font-family: var(--font-serif);
   font-size: 1.75rem;
 }
+.steps h3 {
+  margin-bottom: 1rem;
+}
 .steps p {
   font-size: 0.9375rem;
 }
+
+/* Dúvidas */
 .faq-copy {
   position: sticky;
   top: 8rem;
@@ -597,18 +609,18 @@ em {
   font-weight: 400;
   transition: transform 0.25s;
 }
-.faq-list details[open] summary::after {
+.faq-list [open] summary::after {
   transform: rotate(45deg);
 }
 .faq-list details p {
   padding-bottom: 1.5rem;
   font-size: 0.9375rem;
 }
-.faq-list details[open] p {
+.faq-list [open] p {
   animation: arrive 0.3s ease-out;
 }
 
-/* A agenda separa a escolha do dia dos horários disponíveis. */
+/* Agendamento */
 .booking {
   background: var(--surface-muted);
 }
@@ -646,7 +658,8 @@ em {
 .booking-toolbar {
   border-bottom: 1px solid var(--line);
 }
-.booking-toolbar h3 {
+.booking-toolbar h3,
+.contact-area h3 {
   font-size: 2rem;
 }
 .booking-toolbar > span {
@@ -660,11 +673,11 @@ em {
 .booking-preferences {
   border-right: 1px solid var(--line);
 }
-.booking-times {
-  background: #ffffff45;
-}
 .booking-preferences fieldset {
   margin-bottom: 1.5rem;
+}
+.booking-times {
+  background: #ffffff45;
 }
 .availability-date {
   margin: 0.5rem 0 0.25rem;
@@ -725,67 +738,13 @@ em {
   border-radius: 0.75rem;
   color: var(--muted);
 }
-.contact-area {
-  margin-top: 4rem;
-  padding-top: 3rem;
-  border-top: 1px solid var(--line-warm);
-}
-.contact-area h3 {
-  margin-bottom: 1rem;
-  font-size: 2rem;
-}
-.contact-area p:not(.eyebrow) {
-  font-size: 0.9375rem;
-}
-.contact-methods {
-  align-self: start;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.5rem;
-}
-.contact-methods li {
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--line-warm);
-}
-.contact-methods span {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  margin-bottom: 0.5rem;
-  color: var(--bronze);
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.contact-methods a {
+.selection-summary {
+  min-height: 1.5rem;
   color: var(--navy);
-  font-size: 0.875rem;
-  overflow-wrap: anywhere;
-  text-decoration: underline 2px transparent;
-  text-underline-offset: 0.28em;
-  transition:
-    color 0.2s,
-    text-decoration-color 0.2s;
+  font-size: 0.8125rem;
 }
-.contact-methods a:hover,
-.contact-methods a:focus-visible {
-  color: #735132;
-  text-decoration-color: currentColor;
-}
-.office-address {
-  margin-top: 1.5rem;
-}
-.office-address strong {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  margin-bottom: 0.35rem;
-  color: var(--navy);
-  font-weight: 500;
-}
-.office-address .icon {
-  color: var(--bronze);
-}
+
+/* Campos do formulário */
 fieldset {
   min-width: 0;
   margin: 0;
@@ -809,12 +768,6 @@ legend,
 .modality-options {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-.modality-options .choice {
-  padding: 0.75rem 0;
-  border: 0;
-  border-bottom: 2px solid var(--line);
-  border-radius: 0;
-}
 .time-options {
   grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
 }
@@ -828,6 +781,17 @@ legend,
   transition:
     background-color 0.2s,
     border-color 0.2s;
+}
+.modality-options .choice {
+  padding: 0.75rem 0;
+  border: 0;
+  border-bottom: 2px solid var(--line);
+  border-radius: 0;
+}
+.time-choice {
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.65rem 0.3rem;
 }
 .choice:hover {
   border-color: var(--bronze);
@@ -856,11 +820,6 @@ legend,
   color: var(--muted);
   font-size: 0.75rem;
 }
-.time-choice {
-  justify-content: center;
-  gap: 0.35rem;
-  padding: 0.65rem 0.3rem;
-}
 input[type="date"] {
   display: block;
   width: 100%;
@@ -874,6 +833,13 @@ input[type="date"] {
 }
 input[aria-invalid="true"] {
   border-color: #9b3934;
+}
+fieldset[aria-invalid="true"] .choice {
+  border-color: #ad5148;
+}
+fieldset:disabled .choice {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 .field-hint {
   margin-top: 0.5rem;
@@ -892,22 +858,69 @@ input[aria-invalid="true"] {
   border-radius: 0.5rem;
   background: #f8eae6;
 }
-fieldset[aria-invalid="true"] .choice {
-  border-color: #ad5148;
+
+/* Contato */
+.contact-area {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--line-warm);
 }
-fieldset:disabled .choice {
-  opacity: 0.5;
-  cursor: not-allowed;
+.contact-area h3 {
+  margin-bottom: 1rem;
 }
-.selection-summary {
-  min-height: 1.5rem;
+.contact-area p:not(.eyebrow) {
+  font-size: 0.9375rem;
+}
+.contact-methods {
+  align-self: start;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+.contact-methods li {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line-warm);
+}
+.contact-methods span,
+.office-address strong {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+.contact-methods span {
+  margin-bottom: 0.5rem;
+  color: var(--bronze);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.contact-methods a {
   color: var(--navy);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+  text-decoration: underline 2px transparent;
+  text-underline-offset: 0.28em;
+  transition:
+    color 0.2s,
+    text-decoration-color 0.2s;
 }
-.review-button {
-  width: 100%;
-  margin-top: 1.25rem;
+.contact-methods a:is(:hover, :focus-visible) {
+  color: #735132;
+  text-decoration-color: currentColor;
 }
+.office-address {
+  margin-top: 1.5rem;
+}
+.office-address strong {
+  margin-bottom: 0.35rem;
+  color: var(--navy);
+  font-weight: 500;
+}
+.office-address .icon {
+  color: var(--bronze);
+}
+
+/* Revisão do agendamento */
 .booking-dialog {
   width: min(31rem, calc(100% - 2rem));
   max-height: calc(100dvh - 2rem);
@@ -923,6 +936,9 @@ fieldset:disabled .choice {
 .booking-dialog::backdrop {
   background: #10252dcc;
 }
+.booking-dialog h2 {
+  font-size: 2.75rem;
+}
 .dialog-close {
   position: absolute;
   top: 0.5rem;
@@ -933,9 +949,6 @@ fieldset:disabled .choice {
   background: transparent;
   color: var(--navy);
   font-size: 1.8rem;
-}
-.booking-dialog h2 {
-  font-size: 2.75rem;
 }
 .appointment-summary {
   margin-top: 1.5rem;
@@ -955,13 +968,16 @@ fieldset:disabled .choice {
 .appointment-summary dd {
   color: var(--navy);
 }
-.dialog-notice,
-#confirmation-message {
+.dialog-notice {
   margin-top: 1rem;
   padding: 1rem;
   background: var(--surface-muted);
   border-radius: 0.75rem;
   font-size: 0.8125rem;
+}
+.review-button {
+  width: 100%;
+  margin-top: 1.25rem;
 }
 .text-button {
   display: block;
@@ -979,7 +995,7 @@ fieldset:disabled .choice {
 .site-footer {
   padding-block: 4rem 1.5rem;
   background: var(--navy);
-  color: #dddeda;
+  color: var(--text-on-dark);
 }
 .footer-content {
   display: grid;
@@ -993,7 +1009,9 @@ fieldset:disabled .choice {
   color: var(--paper);
   font-size: 2.75rem;
 }
-.site-footer .brand-label {
+.site-footer .brand-label,
+.footer-title,
+.footer-session li .icon {
   color: var(--bronze-light);
 }
 .footer-about > p {
@@ -1002,7 +1020,6 @@ fieldset:disabled .choice {
 }
 .footer-title {
   margin-bottom: 1.25rem;
-  color: var(--bronze-light);
   font: 500 0.875rem/1.5 var(--font-sans);
 }
 .footer-content p,
@@ -1012,13 +1029,6 @@ fieldset:disabled .choice {
 .footer-content ul {
   display: grid;
   gap: 0.6rem;
-}
-.footer-navigation a:hover,
-.footer-navigation a:focus-visible,
-.navigation > a:not(.button):hover,
-.navigation > a:not(.button):focus-visible {
-  text-decoration: underline;
-  text-underline-offset: 0.3em;
 }
 .footer-navigation a {
   display: inline-block;
@@ -1032,9 +1042,6 @@ fieldset:disabled .choice {
   align-items: center;
   gap: 0.65rem;
 }
-.footer-session li .icon {
-  color: var(--bronze-light);
-}
 .site-footer .button-footer {
   min-height: 3rem;
   margin-top: 1.5rem;
@@ -1047,10 +1054,10 @@ fieldset:disabled .choice {
   background: #e3d6c4;
 }
 .site-footer a:not(.button):hover {
-  color: #e3c9a6;
+  color: var(--highlight-on-dark);
 }
 .site-footer :focus-visible {
-  outline-color: #e3c9a6;
+  outline-color: var(--highlight-on-dark);
 }
 .footer-meta {
   display: flex;
@@ -1065,11 +1072,10 @@ fieldset:disabled .choice {
   font-size: 0.8125rem;
 }
 .footer-meta .text-link {
-  color: var(--paper);
   font-size: inherit;
-  border-color: #b89b76;
 }
 
+/* Responsivo */
 @media (max-width: 1000px) {
   .navigation {
     gap: 1rem;
@@ -1139,6 +1145,7 @@ fieldset:disabled .choice {
     border-color: var(--navy);
     color: #fff;
   }
+  /* Três linhas que viram um X quando o menu abre. */
   .menu-toggle-lines,
   .menu-toggle-lines::before,
   .menu-toggle-lines::after {
@@ -1157,7 +1164,6 @@ fieldset:disabled .choice {
   .menu-toggle-lines::after {
     content: "";
     position: absolute;
-    left: 0;
   }
   .menu-toggle-lines::before {
     transform: translateY(-0.3rem);
@@ -1165,13 +1171,13 @@ fieldset:disabled .choice {
   .menu-toggle-lines::after {
     transform: translateY(0.3rem);
   }
-  .menu-toggle[aria-expanded="true"] .menu-toggle-lines {
+  [aria-expanded="true"] .menu-toggle-lines {
     background: transparent;
   }
-  .menu-toggle[aria-expanded="true"] .menu-toggle-lines::before {
+  [aria-expanded="true"] .menu-toggle-lines::before {
     transform: rotate(45deg);
   }
-  .menu-toggle[aria-expanded="true"] .menu-toggle-lines::after {
+  [aria-expanded="true"] .menu-toggle-lines::after {
     transform: rotate(-45deg);
   }
 
@@ -1196,15 +1202,13 @@ fieldset:disabled .choice {
     transition:
       opacity 0.3s ease,
       transform 0.3s ease,
-      visibility 0s linear 0.3s;
+      visibility 0s 0.3s;
   }
   .menu-open .navigation {
     opacity: 1;
     visibility: visible;
     transform: none;
-    transition:
-      opacity 0.3s ease,
-      transform 0.3s ease;
+    transition-delay: 0s;
   }
   .navigation > a:not(.button) {
     display: flex;
@@ -1213,16 +1217,17 @@ fieldset:disabled .choice {
     padding-block: 1rem;
     border-bottom: 1px solid var(--line);
     color: var(--navy);
-    font-family: var(--font-serif);
-    font-size: 1.75rem;
-    line-height: 1.2;
+    font: 1.75rem/1.2 var(--font-serif);
     counter-increment: menu;
+  }
+  .navigation > a:not(.button)::before,
+  .navigation > a:not(.button)::after {
+    font-family: var(--font-sans);
   }
   .navigation > a:not(.button)::before {
     content: counter(menu, decimal-leading-zero);
     min-width: 1.5rem;
     color: var(--bronze);
-    font-family: var(--font-sans);
     font-size: 0.6875rem;
     letter-spacing: 0.2em;
   }
@@ -1230,12 +1235,8 @@ fieldset:disabled .choice {
     content: "→";
     margin-left: auto;
     color: var(--bronze-light);
-    font-family: var(--font-sans);
     font-size: 1rem;
     transition: transform 0.25s ease;
-  }
-  .navigation > a:not(.button):hover::after {
-    transform: translateX(0.25rem);
   }
   .navigation .button {
     margin-top: 1.5rem;
@@ -1243,6 +1244,7 @@ fieldset:disabled .choice {
     background: var(--navy);
     color: #fff;
   }
+
   .hero,
   .two-columns {
     grid-template-columns: 1fr;
@@ -1290,6 +1292,11 @@ fieldset:disabled .choice {
   }
   .footer-about {
     grid-column: 1 / -1;
+  }
+}
+@media (max-width: 900px), (max-height: 600px) {
+  .faq-copy {
+    position: static;
   }
 }
 @media (max-width: 680px) {
@@ -1341,11 +1348,6 @@ fieldset:disabled .choice {
     grid-template-columns: 1fr;
   }
 }
-@media (max-width: 360px) {
-  .brand-label {
-    display: none;
-  }
-}
 @media (max-width: 420px) {
   .contact-methods {
     grid-template-columns: 1fr;
@@ -1355,9 +1357,9 @@ fieldset:disabled .choice {
     flex-direction: column;
   }
 }
-@media (max-width: 900px), (max-height: 600px) {
-  .faq-copy {
-    position: static;
+@media (max-width: 360px) {
+  .brand-label {
+    display: none;
   }
 }
 @media (prefers-reduced-transparency: reduce) {
@@ -1368,8 +1370,7 @@ fieldset:disabled .choice {
   }
 }
 
-/* As entradas são observadas uma única vez, sem eventos contínuos de scroll.
-   O estado inicial só se aplica com o JS ativo, e a transição não se repete ao mudar o foco. */
+/* Movimento: entradas observadas uma única vez e efeitos de hover. */
 .reveal-ready [data-reveal] {
   opacity: 0;
   transform: translateY(0.5rem);
@@ -1377,8 +1378,7 @@ fieldset:disabled .choice {
     opacity 0.65s ease-out,
     transform 0.65s ease-out;
 }
-.reveal-ready [data-reveal].is-visible,
-.reveal-ready [data-reveal]:focus-within {
+.reveal-ready [data-reveal]:is(.is-visible, :focus-within) {
   opacity: 1;
   transform: none;
 }
@@ -1387,17 +1387,19 @@ fieldset:disabled .choice {
     opacity: 0;
     transform: translateY(0.5rem);
   }
-  to {
-    opacity: 1;
-    transform: none;
-  }
 }
-@media (hover: hover) and (pointer: fine) {
-  .button:hover .icon {
-    transform: translateY(-1px);
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .image-frame img {
+    transition: transform 0.8s cubic-bezier(0.2, 0.65, 0.3, 1);
   }
   .image-frame:hover img {
     transform: scale(1.035);
+  }
+  .button:hover .icon {
+    transform: translateY(-1px);
+  }
+  .navigation > a:not(.button):hover::after {
+    transform: translateX(0.25rem);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1409,10 +1411,5 @@ fieldset:disabled .choice {
   *::after {
     animation: none !important;
     transition: none !important;
-  }
-  .image-frame:hover img,
-  .button:active,
-  .button:hover .icon {
-    transform: none;
   }
 }

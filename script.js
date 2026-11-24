@@ -15,78 +15,61 @@ const WEEKLY_SCHEDULE = {
   5: [[9, 12]],
 };
 
-const form = document.querySelector("#booking-form");
+const $ = (selector) => document.querySelector(selector);
+const form = $("#booking-form");
 const dateInput = form.elements.date;
-const modalityField = document.querySelector("#modality-fieldset");
-const timeField = document.querySelector("#time-fieldset");
-const timeOptions = document.querySelector("#time-options");
-const quickDates = document.querySelector("#quick-dates");
-const dateError = document.querySelector("#date-error");
-const timeError = document.querySelector("#time-error");
-const modalityError = document.querySelector("#modality-error");
-const summary = document.querySelector("#selection-summary");
-const dialog = document.querySelector("#booking-dialog");
-const dialogTitle = document.querySelector("#dialog-title");
-const confirmButton = document.querySelector("#confirm-demo");
-const confirmation = document.querySelector("#confirmation-message");
+const modalityField = $("#modality-fieldset");
+const timeField = $("#time-fieldset");
+const timeOptions = $("#time-options");
+const quickDates = $("#quick-dates");
+const summary = $("#selection-summary");
+const dialog = $("#booking-dialog");
+const dialogTitle = $("#dialog-title");
+const confirmButton = $("#confirm-demo");
+const confirmation = $("#confirmation-message");
 let submitted = false;
 let dateTouched = false;
 let renderedDate = null;
 
-// O dia atual é o de Brasília; o restante trata datas de calendário sem conversão de fuso.
+// O dia atual é o de Brasília (en-CA formata como AAAA-MM-DD);
+// o restante trata datas de calendário sem conversão de fuso.
+const brasiliaToday = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" });
+
 function dateAfter(days) {
-  const parts = new Intl.DateTimeFormat("en", {
-    timeZone: "America/Sao_Paulo",
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-  }).formatToParts(new Date());
-  const part = (name) => Number(parts.find((item) => item.type === name).value);
-  return new Date(Date.UTC(part("year"), part("month") - 1, part("day") + days))
-    .toISOString()
-    .slice(0, 10);
+  const [year, month, day] = brasiliaToday.format(new Date()).split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
 }
 
 function formatDate(value, options = { dateStyle: "long" }) {
-  return new Date(`${value}T12:00:00Z`).toLocaleDateString("pt-BR", {
-    timeZone: "UTC",
-    ...options,
-  });
+  return new Date(`${value}T12:00:00Z`).toLocaleDateString("pt-BR", { timeZone: "UTC", ...options });
 }
 
 function availableTimes(value) {
   const weekday = new Date(`${value}T12:00:00Z`).getUTCDay();
   return (WEEKLY_SCHEDULE[weekday] || []).flatMap(([start, end]) =>
-    Array.from(
-      { length: end - start },
-      (_, index) => `${String(start + index).padStart(2, "0")}:00`,
-    ),
+    Array.from({ length: end - start }, (_, index) => `${String(start + index).padStart(2, "0")}:00`),
   );
 }
 
 function renderTimes(times) {
-  timeOptions.replaceChildren(
-    ...times.map((time) => {
-      const label = document.createElement("label");
-      label.className = "choice time-choice";
-      const input = document.createElement("input");
-      Object.assign(input, { type: "radio", name: "time", value: time, required: true });
-      input.setAttribute("aria-describedby", "time-error");
-      label.append(input, document.createTextNode(time));
-      return label;
-    }),
-  );
-  document.querySelector("#time-empty").hidden = times.length > 0;
+  timeOptions.innerHTML = times
+    .map(
+      (time) => `<label class="choice time-choice">
+        <input type="radio" name="time" value="${time}" required aria-describedby="time-error" />${time}
+      </label>`,
+    )
+    .join("");
+  $("#time-empty").hidden = times.length > 0;
 }
 
-function showError(field, element, message) {
-  field.setAttribute("aria-invalid", String(Boolean(message)));
-  element.textContent = message;
-  field.querySelectorAll("input").forEach((input) => {
-    input.setAttribute("aria-invalid", String(Boolean(message)));
-  });
+function showError(field, errorId, message) {
+  const invalid = String(Boolean(message));
+  field.setAttribute("aria-invalid", invalid);
+  field.querySelectorAll("input").forEach((input) => input.setAttribute("aria-invalid", invalid));
+  $(errorId).textContent = message;
 }
 
+// Atualiza a agenda e devolve o primeiro campo que ainda precisa de resposta.
 function updateForm() {
   dateInput.min = dateAfter(1);
   dateInput.max = dateAfter(90);
@@ -115,63 +98,56 @@ function updateForm() {
     renderedDate = dateKey;
   }
   const time = timeOptions.querySelector("input:checked")?.value || "";
-  quickDates.querySelectorAll("button").forEach((button) => {
+
+  for (const button of quickDates.children) {
     button.setAttribute("aria-pressed", String(button.value === date));
-  });
-  document.querySelector("#availability-date").textContent =
-    date && !dateMessage
-      ? formatDate(date, { weekday: "long", day: "numeric", month: "long" })
-      : "Escolha um dia com atendimento";
-  document.querySelector("#availability-count").textContent = times.length
+  }
+  $("#availability-date").textContent = dateMessage
+    ? "Escolha um dia com atendimento"
+    : formatDate(date, { weekday: "long", day: "numeric", month: "long" });
+  $("#availability-count").textContent = times.length
     ? `${times.length} horários disponíveis`
     : "Sem horários nesta data";
 
-  showError(modalityField, modalityError, submitted ? modalityMessage : "");
-  showError(dateInput, dateError, submitted || dateTouched ? dateMessage : "");
+  showError(modalityField, "#modality-error", submitted ? modalityMessage : "");
+  showError(dateInput, "#date-error", submitted || dateTouched ? dateMessage : "");
   showError(
     timeField,
-    timeError,
+    "#time-error",
     submitted && !dateMessage && !time ? "Escolha um horário para continuar." : "",
   );
   timeField.disabled = Boolean(dateMessage);
-  if (modalityMessage) {
-    summary.textContent = modalityMessage;
-  } else if (dateMessage) {
-    summary.textContent = "Selecione um dia com atendimento para continuar.";
-  } else if (time) {
-    summary.textContent = `${modality === "online" ? "Online" : "Presencial"} · ${formatDate(date)}, às ${time}`;
-  } else {
-    summary.textContent = "Escolha um horário para revisar seu agendamento.";
-  }
 
   if (modalityMessage) {
+    summary.textContent = modalityMessage;
     return modalityField.querySelector("input");
   }
   if (dateMessage) {
+    summary.textContent = "Selecione um dia com atendimento para continuar.";
     return dateInput;
   }
-  return time ? null : timeOptions.querySelector("input");
+  if (!time) {
+    summary.textContent = "Escolha um horário para revisar seu agendamento.";
+    return timeOptions.querySelector("input");
+  }
+  summary.textContent = `${modality === "online" ? "Online" : "Presencial"} · ${formatDate(date)}, às ${time}`;
+  return null;
+}
+
+function touchDate() {
+  dateTouched = true;
+  updateForm();
 }
 
 quickDates.addEventListener("click", (event) => {
   const button = event.target.closest("button");
-  if (!button) {
-    return;
+  if (button) {
+    dateInput.value = button.value;
+    touchDate();
   }
-  dateInput.value = button.value;
-  dateTouched = true;
-  updateForm();
 });
-form.addEventListener("change", (event) => {
-  if (event.target === dateInput) {
-    dateTouched = true;
-  }
-  updateForm();
-});
-dateInput.addEventListener("blur", () => {
-  dateTouched = true;
-  updateForm();
-});
+form.addEventListener("change", (event) => (event.target === dateInput ? touchDate() : updateForm()));
+dateInput.addEventListener("blur", touchDate);
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -181,14 +157,10 @@ form.addEventListener("submit", (event) => {
     invalidField.focus();
     return;
   }
-
-  document.querySelector("#summary-modality").textContent =
-    form.elements.modality.value === "online"
-      ? "Online, por videochamada"
-      : "Presencial, em consultório";
-  document.querySelector("#summary-date").textContent = formatDate(dateInput.value);
-  document.querySelector("#summary-time").textContent =
-    `${timeOptions.querySelector("input:checked").value} · Brasília · 50 minutos`;
+  $("#summary-modality").textContent =
+    form.elements.modality.value === "online" ? "Online, por videochamada" : "Presencial, em consultório";
+  $("#summary-date").textContent = formatDate(dateInput.value);
+  $("#summary-time").textContent = `${form.elements.time.value} · Brasília · 50 minutos`;
   dialogTitle.textContent = "Confira seu encontro.";
   confirmation.hidden = true;
   confirmButton.hidden = false;
@@ -211,89 +183,64 @@ for (let offset = 1; offset <= 90 && quickDates.children.length < 5; offset++) {
   const button = document.createElement("button");
   button.type = "button";
   button.value = date;
-  button.setAttribute(
-    "aria-label",
-    formatDate(date, { weekday: "long", day: "numeric", month: "long", year: "numeric" }),
-  );
-  for (const [tag, text] of [
-    ["span", formatDate(date, { weekday: "short" }).replace(".", "")],
-    ["strong", date.slice(-2)],
-    ["span", formatDate(date, { month: "short" }).replace(".", "")],
-  ]) {
-    const part = document.createElement(tag);
-    part.textContent = text;
-    button.append(part);
-  }
+  button.ariaLabel = formatDate(date, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  button.innerHTML = `<span>${formatDate(date, { weekday: "short" }).replace(".", "")}</span>
+    <strong>${date.slice(-2)}</strong>
+    <span>${formatDate(date, { month: "short" }).replace(".", "")}</span>`;
   quickDates.append(button);
 }
-dateInput.value = quickDates.querySelector("button")?.value || "";
+dateInput.value = quickDates.firstElementChild?.value || "";
 updateForm();
 form.querySelector("[type='submit']").disabled = false;
 
 // Menu expansível do cabeçalho em telas menores.
-const siteHeader = document.querySelector(".site-header");
-const menuToggle = document.querySelector(".menu-toggle");
-const siteMenu = document.querySelector("#site-menu");
+const siteHeader = $(".site-header");
+const menuToggle = $(".menu-toggle");
 
 function setMenu(open) {
   siteHeader.classList.toggle("menu-open", open);
-  menuToggle.setAttribute("aria-expanded", String(open));
-  menuToggle.setAttribute("aria-label", open ? "Fechar menu" : "Abrir menu");
+  menuToggle.ariaExpanded = String(open);
+  menuToggle.ariaLabel = open ? "Fechar menu" : "Abrir menu";
 }
+const menuIsOpen = () => siteHeader.classList.contains("menu-open");
 
-menuToggle.addEventListener("click", () => {
-  setMenu(menuToggle.getAttribute("aria-expanded") !== "true");
-});
-siteMenu.addEventListener("click", (event) => {
-  if (event.target.closest("a")) {
-    setMenu(false);
-  }
-});
+menuToggle.addEventListener("click", () => setMenu(!menuIsOpen()));
 document.addEventListener("click", (event) => {
-  if (siteHeader.classList.contains("menu-open") && !siteHeader.contains(event.target)) {
+  // Fecha ao escolher um link do menu ou ao clicar fora do cabeçalho.
+  if (menuIsOpen() && (event.target.closest("#site-menu a") || !siteHeader.contains(event.target))) {
     setMenu(false);
   }
 });
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && siteHeader.classList.contains("menu-open")) {
+  if (event.key === "Escape" && menuIsOpen()) {
     setMenu(false);
     menuToggle.focus();
   }
 });
-matchMedia("(min-width: 901px)").addEventListener("change", (event) => {
-  if (event.matches) {
-    setMenu(false);
-  }
-});
+matchMedia("(min-width: 901px)").addEventListener("change", (event) => event.matches && setMenu(false));
 
 // Observa a saída do topo da página, sem executar código a cada evento de rolagem.
-if ("IntersectionObserver" in window) {
-  const header = document.querySelector(".site-header");
-  const headerObserver = new IntersectionObserver(([entry]) => {
-    header.classList.toggle("is-scrolled", !entry.isIntersecting);
-  });
-  headerObserver.observe(document.querySelector(".scroll-marker"));
-}
+new IntersectionObserver(([entry]) => siteHeader.classList.toggle("is-scrolled", !entry.isIntersecting)).observe(
+  $(".scroll-marker"),
+);
 
-if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
-  const observer = new IntersectionObserver(
+// Entradas suaves: o que já está na tela aparece direto; o restante é observado uma única vez.
+if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  const revealObserver = new IntersectionObserver(
     (entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
-        }
+      for (const entry of entries.filter((item) => item.isIntersecting)) {
+        entry.target.classList.add("is-visible");
+        revealObserver.unobserve(entry.target);
       }
     },
     { threshold: 0.08 },
   );
-  // O que já está na tela aparece direto; só o restante é escondido e observado.
-  document.querySelectorAll("[data-reveal]").forEach((element) => {
+  for (const element of document.querySelectorAll("[data-reveal]")) {
     if (element.getBoundingClientRect().top < innerHeight) {
       element.classList.add("is-visible");
     } else {
-      observer.observe(element);
+      revealObserver.observe(element);
     }
-  });
+  }
   document.documentElement.classList.add("reveal-ready");
 }
