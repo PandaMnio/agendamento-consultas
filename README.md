@@ -19,7 +19,7 @@ Projeto de portfólio desenvolvido em HTML, CSS e JavaScript, com foco em acolhi
 
 [![Ver prévia do site](https://img.shields.io/badge/Ver_pr%C3%A9via_do_site-1d3541?style=for-the-badge)](https://pandamnio.github.io/agendamento-consultas/)
 [![Ver prévia do site](https://img.shields.io/badge/Ver_performance_do_site-1d3541?style=for-the-badge)](https://pagespeed.web.dev/analysis/https-pandamnio-github-io-agendamento-consultas/z90rdksq22p4ad42h5yfar?form_factor=mobile)
-[![Portfólio de Karin Silveira](https://img.shields.io/badge/Portf%C3%B3lio_de_Karin_Silveira-735132?style=for-the-badge)](https://pandamnio.github.io/portfolio/)
+[![Portfólio de Karin Silveira](https://img.shields.io/badge/Portf%C3%B3lio_de_Karin_Silveira-735132?style=for-the-badge)](https://pandamnio.github.io/karin-silveira-dev/)
 
 
 ## Sobre o desenvolvimento
